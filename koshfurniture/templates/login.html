@@ -9,7 +9,8 @@
 	<div class="row">
 		<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 			<div class="card card-signup">
-				<form class="form" method="POST" action="/signup">
+				<form class="form" method="POST" action="/login/">
+				{% csrf_token %}
 					<div class="header header-danger text-center">
 						<h4 class="card-title">Log in</h4>
 						<div class="social-line">
@@ -25,6 +26,11 @@
 						</div>
 					</div>
 					<p class="description text-center">Or Be Classical</p>
+					{% if error %}
+							<div class="alert alert-danger" role="alert">
+							  {{error}}
+							</div>
+					{% endif %}
 					<div class="card-content">
 
 
@@ -34,14 +40,14 @@
 								<i class="material-icons">email</i>
 							</span>
 							<div class="form-group is-empty"><input type="text" class="form-control"
-									placeholder="Email..." name="email"><span class="material-input"></span></div>
+									placeholder="Email" name="email"><span class="material-input"></span></div>
 						</div>
 
 						<div class="input-group">
 							<span class="input-group-addon">
 								<i class="material-icons">lock_outline</i>
 							</span>
-							<div class="form-group is-empty"><input type="password" placeholder="Password..."
+							<div class="form-group is-empty"><input type="password" placeholder="Password"
 									class="form-control" name="password"><span class="material-input"></span></div>
 						</div>
 
@@ -55,7 +61,8 @@
 								</div> -->
 					</div>
 					<div class="footer text-center">
-						<a href="{% url 'login' %}" class="btn btn-primary btn-simple btn-wd btn-lg">Login</a>
+						<input class="btn btn-primary btn-simple btn-wd btn-lg" type="submit" value="Login" >
+								
 					</div>
 				</form>
 			</div>

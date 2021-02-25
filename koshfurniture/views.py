@@ -1,7 +1,12 @@
 from django.shortcuts import redirect, render
 from .models import *
 from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password, check_password
 import re
+
+
+
+
 
 regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 SpecialSym = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
@@ -38,11 +43,34 @@ def checkout(request):
 def login(request):
     context={}
     return render(request, 'login.html', context)
-    
+
+def validateCustomer(customer):
+    error_message = None
+    if (not customer.name):
+            error_message = "First name Required !!"
+    elif len(customer.name) < 4:
+                error_message = "First name must be 4 Characters or more  "
+    elif not customer.phone:
+            error_message   = " Phone number is required "
+    elif len(customer.phone) < 10 or len(customer.phone) > 10:
+            error_message = " Phone number must be 10 char Long"
+    elif not re.search(regex, customer.email):
+            error_message = " Enter valid email id"
+
+    #PASSOWORD VALIDATION    
+        # elif len(password) < 8:
+        #     error_message = "Password should be 8 char long"
+        # elif not re.search(pat, password):
+        #     error_message="Password should contain Uppper case character, lower case character, special character and at least a number"
+    elif customer.isExists():
+        error_message = "Email address already exists"
+
+    return error_message
+
 def signup(request):
-    context={}
+    
     if request.method =='GET':
-        return render(request, 'registration.html', context)
+        return render(request, 'registration.html')
     else:
         postDATA = request.POST
         fullname = postDATA.get('fullname')
@@ -64,29 +92,12 @@ def signup(request):
                                 email=email,
                                 phone=phone,
                                 password=password)
-        if (not fullname):
-            error_message = "First name Required !!"
-        elif len(fullname) < 4:
-                error_message = "First name must be 4 Characters or more  "
-        elif not phone:
-            error_message   = " Phone number is required "
-        elif len(phone) < 10 or len(phone) > 10:
-            error_message = " Phone number must be 10 char Long"
-        elif not re.search(regex, email):
-            error_message = " Enter valid email id"
-
-        #PASSOWORD VALIDATION    
-        # elif len(password) < 8:
-        #     error_message = "Password should be 8 char long"
-        # elif not re.search(pat, password):
-        #     error_message="Password should contain Uppper case character, lower case character, special character and at least a number"
-        elif customer.isExists():
-            error_message = "Email address already exists"
-
+        
+        error_message =  validateCustomer(customer)
         if not error_message: 
-            print(fullname, email, phone, password)
+
             
-            
+            customer.password = make_password(customer.password)
             customer.register()
             # return redirect('store')
             return redirect('index')

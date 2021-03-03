@@ -13,20 +13,40 @@ SpecialSym = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{
 pat = re.compile(SpecialSym) 
 # Create your views here.
 def index(request):
-    context={}
+    context = {}
+    print(request.session.get('email'))
     return render(request, 'index.html', context)
 
 def store(request):
-    products = None
-    categories = Category.objects.all()
-    categoryID= request.GET.get('category')
-    if categoryID:
-        products = Product.get_all_products_by_id(categoryID)
+    if request.method == 'POST':
+        product = request.POST.get('product')
+        cart = request.session.get('cart')
+        if cart:
+            quantity = cart.get(product)
+            if quantity:
+                cart[product] = quantity + 1
+            else:
+                cart[product] = 1
+        else:
+            cart = {}
+            cart[product] = 1
+        print(cart)
+        request.session['cart'] =cart
+        return redirect('store')
+    
+    
     else:
-        products = Product.get_all_products()
+        
+        products = None
+        categories = Category.objects.all()
+        categoryID= request.GET.get('category')
+        if categoryID:
+            products = Product.get_all_products_by_id(categoryID)
+        else:
+            products = Product.get_all_products()
 
-    context = {'products': products, 'categories':categories}
-    return render(request, 'store.html', context)
+        context = {'products': products, 'categories':categories}
+        return render(request, 'store.html', context)
     
 def contact(request):
     context={}
@@ -51,11 +71,14 @@ def login(request):
         if customer:
             flag = check_password(password, customer.password)
             if flag:
+                request.session['customer_id'] = customer.id
+                request.session['email'] = customer.email
                 return redirect('index')
             else:
                 error_message = 'Email or password invalid!'
         else:
             error_message = 'Email or password invalid!'
+        
         print(email,password)
         return render(request,'login.html',{'error':error_message})
 

@@ -95,7 +95,13 @@
                                 </button>
 
                             </div>
-                            <p style="text-align: center;"><a style="" href="/register/" class="btn btn-danger btn-raised btn-round text-center">Add to cart</a> </p>
+
+                            <form action="/store/" method="POST">
+                                {% csrf_token %}
+                                <input type="text" name="product" value="{{product.id}}" hidden>
+                                <p style="text-align: center;"><button  type="submit" class="btn btn-danger btn-raised btn-round text-center">Add to cart</button> </p>
+                            </form>
+                            
                         </div>
                     </div> <!-- end card -->
                  </div>

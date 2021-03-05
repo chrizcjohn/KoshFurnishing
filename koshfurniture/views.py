@@ -21,10 +21,20 @@ def store(request):
     if request.method == 'POST':
         product = request.POST.get('product')
         cart = request.session.get('cart')
+        remove = request.POST.get('remove')
+
+        
+
         if cart:
             quantity = cart.get(product)
             if quantity:
-                cart[product] = quantity + 1
+                if remove:
+                    if quantity <= 1:
+                        cart.pop(product)
+                    else:
+                        cart[product] = quantity - 1
+                else:
+                    cart[product] = quantity + 1
             else:
                 cart[product] = 1
         else:
@@ -36,7 +46,9 @@ def store(request):
     
     
     else:
-        
+        cart = request.session.get('cart')
+        if not cart:
+            request.session['cart'] ={}
         products = None
         categories = Category.objects.all()
         categoryID= request.GET.get('category')

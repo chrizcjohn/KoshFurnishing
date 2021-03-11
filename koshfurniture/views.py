@@ -65,8 +65,11 @@ def contact(request):
     return render(request, 'contact.html', context)
 
 def cart(request):
-    context={}
-    return render(request, 'cart.html', context)
+    if request.method == "GET":
+        ids = list(request.session.get('cart').keys())
+        products = Product.get_products_by_id(ids)
+        print(products)
+        return render(request, 'cart.html',{'products':products})
 
 def checkout(request):
     context={}
@@ -83,8 +86,8 @@ def login(request):
         if customer:
             flag = check_password(password, customer.password)
             if flag:
-                request.session['customer_id'] = customer.id
-                request.session['email'] = customer.email
+                request.session['customer'] = customer.id
+                
                 return redirect('index')
             else:
                 error_message = 'Email or password invalid!'
@@ -156,4 +159,9 @@ def signup(request):
              'error': error_message,
              'value':value
             }
-            return render(request,'registration.html',data)
+            return render(request, 'registration.html', data)
+
+
+def logout(request):
+    request.session.clear()
+    return redirect('index')

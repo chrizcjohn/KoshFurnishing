@@ -46,19 +46,32 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="navigation-example-2">
                 <ul class="nav navbar-nav navbar-right">
+                    
                     <li>
                         <a href="{% url 'store' %}"> Store </a>
                     </li>
                     <li>
-                        <a href="{% url 'login' %}"> Wishlist </a>
+                        <a href="/cart/"> cart </a>
                     </li>
+                    {% if  request.session.customer %}
 
-                    <li >
-                        <a class="btn btn-rose btn-raised btn-round"  href="{% url 'login' %}" >Login In</a>
+                     
+                    
+                    <li>
+                        <a href="/checkout/"> checkout </a>
                     </li>
                     <li>
-                        <a href="{% url 'login' %}" class="btn btn-rose btn-raised btn-round" >Logout</a>
+                        <a href="/logout/" class="btn btn-rose btn-raised btn-round" >Logout</a>
                     </li>
+                    
+
+                    {% else %}
+                    <li>
+                        <a class="btn btn-rose btn-raised btn-round"  href="{% url 'login' %}" >Login / Signup</a>
+                    </li>
+
+    
+                    {% endif %}
 
                 </ul>
             </div>

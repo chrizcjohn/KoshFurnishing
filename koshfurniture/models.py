@@ -66,6 +66,12 @@ class Product(models.Model):
     discount = models.ForeignKey(Discount, on_delete=models.SET_NULL , null=True ,blank=True)
     material = models.ForeignKey(Material, on_delete=models.SET_NULL , null=True ,blank=True)
     image = models.ImageField(null=True,blank =True)
+    
+    
+    @staticmethod
+    def get_products_by_id(ids):
+        return Product.objects.filter(id__in =ids )
+
 
     @staticmethod
     def get_all_products():

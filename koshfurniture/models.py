@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=200, null=True)
@@ -98,10 +99,22 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-    date_ordered = models.DateField(auto_now_add=True)
-    complete = models.BooleanField(default =True)
-    transaction_id = models.CharField(max_length =200,null =True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE, null=True)
+    quantity = models.IntegerField(default=1)
+    price = models.IntegerField(default=0)
+    address = models.CharField(max_length=200,default='',blank =True)
+    phone = models.IntegerField(default=0, blank =True)
+    date = models.DateField(default=datetime.datetime.today)
+    status = models.BooleanField(default=False)
+
+    def placeOrder(self):
+        self.save()
+
+    @staticmethod
+    def get_orders_by_customer(customer_id):
+        return Order.objects.filter(customer = customer_id).order_by('-date')
+
 
     def __str__(self):
         return str(self.id)

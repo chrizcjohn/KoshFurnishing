@@ -25,7 +25,7 @@ SECRET_KEY = '9t@2f38jhx9!zao*x%32fbhrer6%954j$490yakbtxrdwkmgo2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'koshfurniture.middlewares.auth.auth_middleware'
 ]
 
 ROOT_URLCONF = 'KoshFurnishing.urls'

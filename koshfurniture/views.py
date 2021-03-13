@@ -3,28 +3,42 @@ from .models import *
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
 import re
-
-
-
-
+from django.views import View
+from .middlewares.auth import auth_middleware
+from django.utils.decorators import method_decorator
 
 regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 SpecialSym = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
 pat = re.compile(SpecialSym) 
 # Create your views here.
-def index(request):
-    context = {}
-    print(request.session.get('email'))
-    return render(request, 'index.html', context)
 
-def store(request):
-    if request.method == 'POST':
+class Index(View):
+    def get(self, request):
+        context = {}
+        print(request.session.get('email'))
+        return render(request, 'index.html', context)
+
+
+class Store(View):
+    def get(self,request):
+        cart = request.session.get('cart')
+        if not cart:
+            request.session['cart'] ={}
+        products = None
+        categories = Category.objects.all()
+        categoryID= request.GET.get('category')
+        if categoryID:
+            products = Product.get_all_products_by_id(categoryID)
+        else:
+            products = Product.get_all_products()
+
+        context = {'products': products, 'categories':categories}
+        return render(request, 'store.html', context)
+
+    def post(self,request):
         product = request.POST.get('product')
         cart = request.session.get('cart')
         remove = request.POST.get('remove')
-
-        
-
         if cart:
             quantity = cart.get(product)
             if quantity:
@@ -43,42 +57,60 @@ def store(request):
         print(cart)
         request.session['cart'] =cart
         return redirect('store')
-    
-    
-    else:
-        cart = request.session.get('cart')
-        if not cart:
-            request.session['cart'] ={}
-        products = None
-        categories = Category.objects.all()
-        categoryID= request.GET.get('category')
-        if categoryID:
-            products = Product.get_all_products_by_id(categoryID)
-        else:
-            products = Product.get_all_products()
 
-        context = {'products': products, 'categories':categories}
-        return render(request, 'store.html', context)
+
+   
+        
     
 def contact(request):
     context={}
     return render(request, 'contact.html', context)
 
-def cart(request):
-    if request.method == "GET":
-        ids = list(request.session.get('cart').keys())
-        products = Product.get_products_by_id(ids)
-        print(products)
-        return render(request, 'cart.html',{'products':products})
+
+class Cart(View):
+    def get(self, request):
+            
+            if 'cart' not in request.session:
+                request.session['cart'] = {}
+                return render(request, 'cart.html')
+            else:
+                ids = list(request.session.get('cart').keys())
+                products = Product.get_products_by_id(ids)
+                print(products)
+                return render(request, 'cart.html', {'products': products})
+        
+
+    
 
 def checkout(request):
-    context={}
-    return render(request, 'checkout.html', context)
+    if request.method == "POST":
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        customer = request.session.get('customer')
+        cart = request.session.get('cart')
+        products = Product.get_products_by_id(list(cart.keys()))
+        print(address,phone,customer,cart,products)
 
-def login(request):
-    if request.method =="GET":
+        for product in products:
+            print(cart.get(str(product.id)))
+            order = Order(customer=Customer(id = customer),
+                            product=product,
+                            price=product.price,
+                            address=address,
+                            phone = phone,
+                            quantity=cart.get(str(product.id))
+                            )
+            order.placeOrder()
+        request.session['cart'] = {}
+        return redirect('cart')
+
+class Login(View):
+    return_url = None
+    def get(self, request):
+        Login.return_url = request.GET.get('return_url')
         return render(request, 'login.html')
-    else:
+    
+    def post(self, request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         customer = Customer.get_customer_by_email(email)
@@ -88,6 +120,7 @@ def login(request):
             if flag:
                 request.session['customer'] = customer.id
                 
+                
                 return redirect('index')
             else:
                 error_message = 'Email or password invalid!'
@@ -96,6 +129,9 @@ def login(request):
         
         print(email,password)
         return render(request,'login.html',{'error':error_message})
+
+
+        
 
 def validateCustomer(customer):
     error_message = None
@@ -120,11 +156,12 @@ def validateCustomer(customer):
 
     return error_message
 
-def signup(request):
-    
-    if request.method =='GET':
+
+class Signup(View):
+    def get(self, request):
         return render(request, 'registration.html')
-    else:
+
+    def post(self, request):
         postDATA = request.POST
         fullname = postDATA.get('fullname')
         email = postDATA.get('email')
@@ -161,6 +198,58 @@ def signup(request):
             }
             return render(request, 'registration.html', data)
 
+# def signup(request):
+    
+    # if request.method =='GET':
+    #     return render(request, 'registration.html')
+    # else:
+    #     postDATA = request.POST
+    #     fullname = postDATA.get('fullname')
+    #     email = postDATA.get('email')
+    #     phone = postDATA.get('Phone')
+    #     password = postDATA.get('password')
+    #     #VALIDATION
+
+    #     value = {
+    #         'fullname': fullname,
+    #         'email': email,
+    #         'phone': phone,
+    #     }
+        
+    #     error_message = None
+        
+
+    #     customer = Customer(name=fullname,
+    #                             email=email,
+    #                             phone=phone,
+    #                             password=password)
+        
+    #     error_message =  validateCustomer(customer)
+    #     if not error_message: 
+
+            
+    #         customer.password = make_password(customer.password)
+    #         customer.register()
+    #         # return redirect('store')
+    #         return redirect('index')
+    #     else:
+    #         data = {
+    #          'error': error_message,
+    #          'value':value
+    #         }
+    #         return render(request, 'registration.html', data)
+
+
+class OrderView(View):
+    @method_decorator(auth_middleware)
+    def get(self, request):
+        customer = request.session.get('customer')
+        orders = Order.get_orders_by_customer(customer)
+        print(orders)
+        orders = orders.reverse()
+        return render(request, 'orders.html', {'orders':orders})
+
+        
 
 def logout(request):
     request.session.clear()

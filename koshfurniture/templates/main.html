@@ -51,14 +51,15 @@
                         <a href="{% url 'store' %}"> Store </a>
                     </li>
                     <li>
-                        <a href="/cart/"> cart </a>
+                        <a href="/cart/"> cart <span class="label label-info">{{request.session.cart.keys|length}}</span></a>
+                        
                     </li>
                     {% if  request.session.customer %}
 
                      
                     
                     <li>
-                        <a href="/checkout/"> checkout </a>
+                        <a href="/order/"> Orders </a>
                     </li>
                     <li>
                         <a href="/logout/" class="btn btn-rose btn-raised btn-round" >Logout</a>

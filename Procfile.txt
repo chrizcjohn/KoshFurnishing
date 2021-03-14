@@ -1,1 +1,0 @@
-web : gunicorn KoshFurnishing.wsgi.py  --log-file -

@@ -48,7 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
+    # 'whitenoise.middleware.WhiteNoiseMiddleware'
     # 'koshfurniture.middlewares.auth.auth_middleware'
 ]
 
@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': 'KoshFurniture',
         'USER': 'postgres',
         'PASSWORD': 'admin',
-        'HOST':'kosh-furniture1.herokuapp.com'
+        'HOST':'localhost'
 
     }
     
@@ -134,6 +134,5 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/images/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -7,10 +7,16 @@
 
 
 <body>
-    <!-- Set up a container element for the button -->
-    <div id="paypal-button-container">
 
+
+    <div class="container">
         
+    
+    
+    <!-- Set up a container element for the button -->
+    <div   id="paypal-button-container">
+        <h4>Payable amount: Rs {{payment}}</h4>
+        <h4>Order Id: {{orderlist}} </h4>
         
     </div>
     
@@ -87,6 +93,9 @@
 
         }).render('#paypal-button-container');
     </script>
+    </div>
+    
+    
 </body>
 
 {% endblock content %}

@@ -13,19 +13,19 @@
 				{% csrf_token %}
 					<div class="header header-danger text-center">
 						<h4 class="card-title">Log in</h4>
-						<div class="social-line">
-							<a href="#pablo" class="btn btn-just-icon btn-simple">
-								<i class="fa fa-facebook-square"></i>
-							</a>
+						 <div class="social-line">
+							{% comment %} <a href="#pablo" class="btn btn-just-icon btn-simple"> {% endcomment %}
+							<p><strong>Login for your design home</strong></p>
+							{% comment %} </a> 
 							<a href="#pablo" class="btn btn-just-icon btn-simple">
 								<i class="fa fa-twitter"></i>
 							</a>
 							<a href="#pablo" class="btn btn-just-icon btn-simple">
 								<i class="fa fa-google-plus"></i>
-							</a>
-						</div>
+							</a> {% endcomment %}
+						</div> 
 					</div>
-					<p class="description text-center">Or Be Classical</p>
+					{% comment %} <p class="description text-center">Or Be Classical</p> {% endcomment %}
 					{% if error %}
 							<div class="alert alert-danger" role="alert">
 							  {{error}}

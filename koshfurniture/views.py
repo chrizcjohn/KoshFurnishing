@@ -6,6 +6,8 @@ import re
 from django.views import View
 from .middlewares.auth import auth_middleware
 from django.utils.decorators import method_decorator
+import json
+from django.http import JsonResponse
 
 regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 SpecialSym = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
@@ -62,47 +64,29 @@ class Store(View):
    
         
     
-def contact(request):
-    context={}
-    return render(request, 'contact.html', context)
+
 
 
 class Cart(View):
     def get(self, request):
             
             if 'cart' not in request.session:
-                request.session['cart'] = {}
+                request.session['cart'] = None
                 return render(request, 'cart.html')
             else:
                 ids = list(request.session.get('cart').keys())
+
                 products = Product.get_products_by_id(ids)
-                print(products)
+                if len(products) == 0:
+                    print("no value")
+                else:
+                    print('value is there')
                 return render(request, 'cart.html', {'products': products})
         
 
     
 
-def checkout(request):
-    if request.method == "POST":
-        address = request.POST.get('address')
-        phone = request.POST.get('phone')
-        customer = request.session.get('customer')
-        cart = request.session.get('cart')
-        products = Product.get_products_by_id(list(cart.keys()))
-        print(address,phone,customer,cart,products)
 
-        for product in products:
-            print(cart.get(str(product.id)))
-            order = Order(customer=Customer(id = customer),
-                            product=product,
-                            price=product.price,
-                            address=address,
-                            phone = phone,
-                            quantity=cart.get(str(product.id))
-                            )
-            order.placeOrder()
-        request.session['cart'] = {}
-        return redirect('cart')
 
 class Login(View):
     return_url = None
@@ -146,11 +130,11 @@ def validateCustomer(customer):
     elif not re.search(regex, customer.email):
             error_message = " Enter valid email id"
 
-    #PASSOWORD VALIDATION    
-        # elif len(password) < 8:
-        #     error_message = "Password should be 8 char long"
-        # elif not re.search(pat, password):
-        #     error_message="Password should contain Uppper case character, lower case character, special character and at least a number"
+    # PASSOWORD VALIDATION    
+    elif len(customer.password) < 8:
+            error_message = "Password should be 8 char long"
+    # elif not re.search(pat, customer.password):
+    #         error_message="Password should contain Uppper case character, lower case character, special character and at least a number"
     elif customer.isExists():
         error_message = "Email address already exists"
 
@@ -173,6 +157,7 @@ class Signup(View):
             'fullname': fullname,
             'email': email,
             'phone': phone,
+            
         }
         
         error_message = None
@@ -254,3 +239,67 @@ class OrderView(View):
 def logout(request):
     request.session.clear()
     return redirect('index')
+
+
+class Paymentcomplete(View):
+    def get(self, request):
+        return render(request, 'complete.html')
+        
+    def post(self, request):
+        
+        body = json.loads(request.body)
+        print('body =' ,body)
+        customer = body.get('customer')
+        price = body.get('price')
+        orderlist = body.get('orderlist')
+        transactionid ="xxxxxxxxxxxxxxxxx"
+        orderplace = Orderplaced(customer=Customer(id=customer),
+                        orderIds=orderlist,
+                        price=price,
+                        transactionid=transactionid,
+                        )
+
+        orderplace.ordersave()
+        # print(customer,price,orderlist,order)
+
+        return render(request, 'complete.html')
+        
+
+def checkout(request):
+    if request.method == "POST":
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        pincode = request.POST.get('pincode')
+        customer = request.session.get('customer')
+        cart = request.session.get('cart')
+        payamount= request.POST.get('payamount')
+        products = Product.get_products_by_id(list(cart.keys()))
+        print(address, phone, customer, cart, products ,payamount)
+        error_message = None
+        value = {
+            'address': address,
+            'pincode': pincode
+
+        }
+        orderlist = []       
+        for product in products:
+        
+            print(cart.get(str(product.id)))
+            order = Order(customer=Customer(id = customer),
+                            product=product,
+                            price=product.price,
+                            address=address,
+                            phone = phone,
+                            quantity=cart.get(str(product.id))
+                            )
+            order.placeOrder()
+            orderlist.append(order.id)
+
+        orderlst =','.join([str(elem) for elem in orderlist])
+        
+            
+        request.session['cart'] = {}
+
+        print (orderlst)
+        
+        return render(request, 'payment.html', {'payment': payamount, 'orderlist': orderlst, 'customer':customer})

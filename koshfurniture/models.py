@@ -55,12 +55,12 @@ class Customer(models.Model):
             return False
 
         
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
-    price = models.FloatField()
+    price = models.IntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     Description = models.CharField(max_length=200, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL , null=True ,blank=True)
@@ -103,7 +103,8 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField(default=1)
     price = models.IntegerField(default=0)
-    address = models.CharField(max_length=200,default='',blank =True)
+    address = models.CharField(max_length=200, default='', blank=True)
+    pincode = models.CharField(max_length=20, default='')
     phone = models.IntegerField(default=0, blank =True)
     date = models.DateField(default=datetime.datetime.today)
     status = models.BooleanField(default=False)
@@ -140,4 +141,17 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return self.address
+
+
+class Orderplaced(models.Model):
+    price = models.IntegerField(default=0)
+    orderIds = models.CharField(max_length=30,default ='')
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    transactionid = models.CharField(max_length=200, null=True,blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def ordersave(self):
+        return self.save()
+    
+    
 

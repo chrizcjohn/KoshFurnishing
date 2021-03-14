@@ -6,6 +6,22 @@
     <meta charset="utf-8" />
     <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
     <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    
+    <style>
+        /* Media query for mobile viewport */
+        @media screen and (max-width: 400px) {
+            #paypal-button-container {
+                width: 100%;
+            }
+        }
+        
+        /* Media query for desktop viewport */
+        @media screen and (min-width: 400px) {
+            #paypal-button-container {
+                width: 250px;
+            }
+        }
+    </style>
 
 
     <title>Kosh Furnitures</title>
@@ -47,6 +63,9 @@
             <div class="collapse navbar-collapse" id="navigation-example-2">
                 <ul class="nav navbar-nav navbar-right">
                     
+                    <li>
+                        <a href="{% url 'store' %}"> Store </a>
+                    </li>
                     <li>
                         <a href="{% url 'store' %}"> Store </a>
                     </li>

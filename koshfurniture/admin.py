@@ -15,6 +15,7 @@ admin.site.register(Brand)
 admin.site.register(Category)
 admin.site.register(Discount)
 admin.site.register(Material)
+admin.site.register(Orderplaced)
 # Register your models here.
 admin.site.site_header = 'Kosh Furnitures'                    # default: "Django Administration"
 admin.site.index_title = 'Admin panel'                 # default: "Site administration"

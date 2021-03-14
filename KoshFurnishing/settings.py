@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'KoshFurniture',
         'USER': 'postgres',
         'PASSWORD': 'admin',
-        'HOST':'localhost'
+        'HOST':'kosh-furniture1.herokuapp.com'
 
     }
     
